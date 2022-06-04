@@ -1,3 +1,4 @@
+import { Schedules } from './../entity/schedules';
 import { User } from './../entity/User';
 import { Service } from './../entity/service';
 import { AppDataSource } from "../data-source";
@@ -33,12 +34,12 @@ async function findHour(req,res){
 async function updateHour(req,res){
    const _id=req.params.id
   
-    let updateHour:any = await hourRepository.findOneBy({
-        hour_id: _id,
-    })
-    updateHour=req.body
-    await hourRepository.save( updateHour)
-    .then( (allHour) => res.json(allHour))
+    let updateHour:any = await hourRepository.update({
+        hour_id: _id
+    },{
+        "initialTime":DateTime.fromSQL(req.body.initialTime).toJSDate(),
+        "finalTime":DateTime.fromSQL(req.body.finalTime).toJSDate()
+    }).then( (allHour) => res.json(allHour))
     console.log("User updated from the db: ", updateHour)
 }
 async function addHour(req,res){
@@ -65,9 +66,17 @@ async function addHour(req,res){
 
 async function deleteHour(req,res){
     const _id=req.params.id
-    let hourToDelete:any = await hourRepository.findOneBy({
-        hour_id: _id,
+    let hourToDelete:any = await hourRepository.findOne({
+        where: {hour_id: _id,},
+        relations: {
+          schedule:true
+      }
     })
+    if(hourToDelete.schedule.length>0){
+        const deleteScheduleRepository = AppDataSource.getRepository(Schedules)
+        let findScheduleDelete = await deleteScheduleRepository.query(
+            `DELETE FROM schedules where hourHourId=?;`   , [_id] 
+        )}
     await hourRepository.remove(hourToDelete)
     .then( (allHour) => res.json(allHour))
     console.log("User removed from the db: ", hourToDelete)
@@ -76,4 +85,3 @@ async function deleteHour(req,res){
 
 
 export default { findAll,findHour,updateHour,addHour,deleteHour } 
-

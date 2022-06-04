@@ -33,17 +33,16 @@ async function findSchedule(req,res){
     console.log("Schedule ",findSchedule, " was found from the db: " )
 }
 
-async function updateSchedule(req,res){
+/*async function updateSchedule(req,res){
    const _id=req.params.id
   
-    let updateSchedule:any = await scheduleRepository.findOneBy({
-        schedule_id: _id,
-    })
-    updateSchedule=req.body
-    await scheduleRepository.save( updateSchedule)
-    .then( (updateSchedule) => res.json(updateSchedule))
+    let updateSchedule:any = await scheduleRepository.update({
+        schedule_id: _id
+    },{
+
+    }).then( (updateSchedule) => res.json(updateSchedule))
     console.log("Schedule updated from the db: ", updateSchedule)
-}
+}*/
 async function addSchedule(req,res){
     let user_id=req.body.user_id
     const findUserRepository = await AppDataSource.getRepository(User)
@@ -98,5 +97,5 @@ async function deleteSchedule(req,res){
 
 
 
-export default { findAll,findSchedule,updateSchedule,addSchedule,deleteSchedule } 
+export default { findAll,findSchedule,addSchedule,deleteSchedule } 
 

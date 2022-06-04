@@ -17,7 +17,7 @@ console.log('Server is running on port 3000')
 
 AppDataSource.initialize().then(async () => {
 
-        /*const datasorce= await AppDataSource.manager.find(UserTypes)   
+        const datasorce= await AppDataSource.manager.find(UserTypes)   
         const userTypesConsumer= new UserTypes()
         userTypesConsumer.description="consumer"
         const userTypesProfessional= new UserTypes()
@@ -25,5 +25,5 @@ AppDataSource.initialize().then(async () => {
         await AppDataSource.manager.save(userTypesConsumer)
         console.log("Saved a new user with id: " + userTypesConsumer.Type_id)
         await AppDataSource.manager.save(userTypesProfessional)
-        console.log("Saved a new user with id: " + userTypesProfessional.Type_id)*/
+        console.log("Saved a new user with id: " + userTypesProfessional.Type_id)
 }).catch(error => console.log(error))

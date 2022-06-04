@@ -11,7 +11,8 @@ async function findAll(req,res){
     const allServices:any = await serviceRepository.find({
         relations: {
             user:true,
-            hour:true
+            hour:true,
+            schedule:true
       }
       
     
@@ -34,11 +35,12 @@ async function findService(req,res){
 async function updateService(req,res){
    const _id=req.params.id
   
-    let updateService:any = await serviceRepository.findOneBy({
+    let updateService:any = await serviceRepository.update({
         service_id: _id,
+    },{
+        "serviceName": req.body.serviceName,
+        "description": req.body.description
     })
-    updateService=req.body
-    await serviceRepository.save( updateService)
     .then( (updateService) => res.json(updateService))
     console.log("Service updated from the db: ", updateService)
 }
@@ -66,17 +68,23 @@ async function addService(req,res){
 
 async function deleteService(req,res){
     let idUserDelete=req.params.id
+    const serviceToDelete:any = await serviceRepository.findOne({
+        where: {service_id:idUserDelete},
+        relations: {
+            hour:true,
+            schedule:true
+        }
+    })
+    if(serviceToDelete.hour.length>0){
     const deleteHourRepository = AppDataSource.getRepository(Hour)
     let findHourDelete = await deleteHourRepository.query(
         `DELETE FROM hour where userId=?;`   , [idUserDelete] 
-    )
+    )}
+    if(serviceToDelete.schedule.length>0){
     const deleteScheduleRepository = AppDataSource.getRepository(Schedules)
     let findScheduleDelete = await deleteScheduleRepository.query(
         `DELETE FROM schedule where userId=?;`   , [idUserDelete] 
-    )
-    let serviceToDelete:any = await serviceRepository.findOneBy({
-        service_id: idUserDelete,
-    })
+    )}
     await serviceRepository.remove(serviceToDelete)
     .then( (ServiceToDelete) => res.json(ServiceToDelete))
     console.log("Service removed from the db: ", serviceToDelete)

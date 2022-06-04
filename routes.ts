@@ -27,7 +27,8 @@ routes.post('/hour', hour.addHour);
 
 routes.get('/schedule',schedule.findAll);
 routes.get('/schedule/:id',schedule.findSchedule);
-routes.put('/schedule/:id',schedule.updateSchedule);
+routes.patch('/schedule/:id',function(req,res){res.send(" Devido as regras de negocio estabelecidas os agendamentos não estão permitidos serem atualizados")});
+routes.put('/schedule/:id',function(req,res){res.send(" Devido as regras de negocio estabelecidas os agendamentos não estão permitidos serem atualizados")});
 routes.delete('/schedule/:id',schedule.deleteSchedule);
 routes.post('/schedule', schedule.addSchedule);
 

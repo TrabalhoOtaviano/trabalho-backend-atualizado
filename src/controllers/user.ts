@@ -30,15 +30,24 @@ async function findUser(req,res){
 }
 
 async function updateUser(req,res){
+    let UserTypeIdToSearch=req.body.userTypes
+    const findUserRepository = AppDataSource.getRepository(UserTypes)
+    let userTypesId = await findUserRepository.findOneBy({
+        Type_id: UserTypeIdToSearch,
+    })
    const _id=req.params.id
   
-    let updateUser:any = await userRepository.findOneBy({
-        id: _id,
-    })
-    updateUser=req.body
-    await userRepository.save( updateUser)
-    .then( (updateUser) => res.json(updateUser))
-    console.log("User updated from the db: ", updateUser)
+    let updateUser:any = await userRepository.update({
+        id: _id
+    },{
+        "firstName": req.body.firstName,
+        "lastName": req.body.lastName,
+        "email":req.body.email,
+        "nickname": req.body.nickname,
+        "password": req.body.password
+    }).then( (updateUser) => res.json(updateUser))
+    console.log("New user from the db: ", updateUser)
+
 }
 async function addUser(req,res){
     let UserTypeIdToSearch=req.body.userTypes
@@ -60,21 +69,31 @@ async function addUser(req,res){
 
 async function deleteUser(req,res){
     let idUserDelete=req.params.id
-    const deleteHourRepository = AppDataSource.getRepository(Hour)
-    let findHourDelete = await deleteHourRepository.query(
-        `DELETE FROM hour where userId=?;`   , [idUserDelete] 
-    )
+    let userToDelete:any = await userRepository.findOne({
+        where: {id:idUserDelete},
+        relations: {
+          userTypes:true,
+          hour:true,
+          schedule:true,
+          services:true
+      }
+    })
+    if(userToDelete.hour.length>0){
+        console.log("PASSEI NO IF DA HORA")
+        const deleteHourRepository = AppDataSource.getRepository(Hour)
+        let findHourDelete = await deleteHourRepository.query(
+            `DELETE FROM hour where userId=?;`   , [idUserDelete] 
+        )}
+    if(userToDelete.schedule.length>0){
     const deleteScheduleRepository = AppDataSource.getRepository(Schedules)
     let findScheduleDelete = await deleteScheduleRepository.query(
         `DELETE FROM schedule where userId=?;`   , [idUserDelete] 
-    )
+    )}
+    if(userToDelete.services.length>0){
     const deleteServiceRepository = AppDataSource.getRepository(Service)
     let findDelete = await deleteServiceRepository.query(
         `DELETE FROM service where userId=?;`   , [idUserDelete] 
-    )
-    let userToDelete:any = await userRepository.findOneBy({
-        id:idUserDelete,
-    })
+    )}
     await userRepository.remove(userToDelete)
     .then( (userToDelete) => res.json(userToDelete))
     console.log("User removed from the db: ", userToDelete)
