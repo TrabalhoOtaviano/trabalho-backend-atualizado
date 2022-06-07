@@ -1,4 +1,4 @@
-# trabalho-backend-atualizado
+# trabalho-backend
 
 trabalho feito em typescript, usando o gerenciador de pacotes pnpm, banco de dados mysql e para manipular o banco de dados foi escolhido o typeorm.
 
